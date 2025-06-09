@@ -17,7 +17,7 @@ class WasteCategoryResource extends Resource
 {
     protected static ?string $model = WasteCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'hugeicons-waste-restore';
 
 
 public static function form(Form $form): Form
@@ -29,8 +29,8 @@ public static function form(Form $form): Form
                 ->maxLength(191),
             Forms\Components\Select::make('type')
                 ->options([
-                    'organic' => 'Organik',
-                    'inorganic' => 'Anorganik',
+                    'organic' => 'Organic',
+                    'inorganic' => 'Inorganic',
                 ])
                 ->required(),
             Forms\Components\TextInput::make('price_per_kg')

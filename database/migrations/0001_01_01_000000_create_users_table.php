@@ -1,53 +1,32 @@
 <?php
-
+// database/migrations/xxxx_xx_xx_xxxxxx_create_users_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-         Schema::create('users', function (Blueprint $table) {
-            $table->id(); // bigint, primary key, auto increment
-            $table->string('name', 191);
-            $table->string('email', 191)->unique();
-            $table->string('phone_number', 191)->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password', 191);
-            $table->enum('role', ['user', 'collector', 'admin'])->default('user');
-            $table->decimal('balance', 10, 2)->default(0.00);
-            $table->text('address')->nullable();
-            $table->rememberToken(); // varchar(100)
-            $table->timestamps(); // created_at, updated_at
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+        Schema::create('users', function (Blueprint $table) {
+            $table->id(); // bigint UNSIGNED NOT NULL AUTO_INCREMENT
+            $table->string('name'); // varchar(255) NOT NULL
+            $table->string('email')->unique(); // varchar(255) NOT NULL UNIQUE
+            $table->string('phone_number'); // varchar(255) NOT NULL
+            $table->string('password'); // varchar(255) NOT NULL
+            $table->string('avatar')->nullable(); // varchar(255) DEFAULT NULL
+            $table->enum('role', ['user', 'collector', 'admin'])->default('user'); // enum NOT NULL DEFAULT 'user'
+            $table->decimal('balance', 10, 2)->default(0.00); // decimal(10,2) NOT NULL DEFAULT '0.00'
+            $table->boolean('email_verified')->default(false); // tinyint(1) NOT NULL DEFAULT '0'
+            $table->string('otp_code')->nullable(); // varchar(255) DEFAULT NULL
+            $table->timestamp('otp_expires_at')->nullable(); // timestamp NULL DEFAULT NULL
+            $table->rememberToken(); // varchar(100) DEFAULT NULL
+            $table->timestamps(); // created_at, updated_at timestamp NULL DEFAULT NULL
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };
