@@ -28,17 +28,8 @@ public static function form(Form $form): Form
                 ->searchable()
                 ->preload()
                 ->required(),
-            Forms\Components\Select::make('collector_id')
-                ->relationship(name: 'collector', titleAttribute: 'id') // Menampilkan ID collector
-                // Untuk menampilkan nama user collector, perlu customisasi lebih atau Eager Loading
-                // Atau ->relationship('collector.user', 'name') jika relasi di Collector model ada 'user'
-                // Atau buat accessor di Collector model misal: getCollectorInfoAttribute
-                ->getOptionLabelFromRecordUsing(fn (App\Models\Collector $record) => "{$record->user->name} (ID: {$record->id})")// Menampilkan nama dan ID
-                ->searchable(['user.name']) // Memungkinkan pencarian berdasarkan nama user di collector
-                ->preload()
-                ->nullable(),
             Forms\Components\Textarea::make('pickup_location')
-                ->required()
+                ->nullable() // Sesuai SQL
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('total_weight')
                 ->numeric()
@@ -48,48 +39,43 @@ public static function form(Form $form): Form
                 ->numeric()
                 ->inputMode('decimal')
                 ->nullable(),
-            Forms\Components\Select::make('status')
+            Forms\Components\FileUpload::make('image_path') // BARU
+                ->image()
+                ->directory('transaction_proofs') // Tentukan folder penyimpanan
+                ->nullable(),
+            Forms\Components\Select::make('status') // ENUM DIPERBARUI
                 ->options([
+                    'cart' => 'Cart',
                     'pending' => 'Pending',
                     'verified' => 'Verified',
                     'rejected' => 'Rejected',
-                    'completed' => 'Completed',
-                    'cancelled' => 'Cancelled',
                 ])
                 ->required()
-                ->default('pending'),
-            Forms\Components\TextInput::make('verification_token')
-                ->maxLength(64)
-                ->nullable()
-                ->unique(ignoreRecord: true),
-            Forms\Components\DateTimePicker::make('token_expires_at')
-                ->nullable(),
+                ->default('cart'),
             Forms\Components\Textarea::make('rejection_reason')
                 ->nullable()
                 ->columnSpanFull(),
         ]);
 }
+
 public static function table(Table $table): Table
 {
     return $table
         ->columns([
             Tables\Columns\TextColumn::make('user.name')
-                ->label('Requester')
+                ->label('User')
                 ->searchable()
                 ->sortable(),
-            Tables\Columns\TextColumn::make('collector.user.name') // Asumsi relasi collector->user ada
-                ->label('Collector')
-                ->placeholder('Not Assigned')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('status')
+            Tables\Columns\ImageColumn::make('image_path') // BARU
+                ->disk('public') // Sesuaikan disk jika perlu
+                ->label('Image Proof'),
+            Tables\Columns\TextColumn::make('status') // ENUM DIPERBARUI
                 ->badge()
                 ->color(fn (string $state): string => match ($state) {
+                    'cart' => 'gray',
                     'pending' => 'warning',
-                    'verified' => 'info',
-                    'completed' => 'success',
+                    'verified' => 'success',
                     'rejected' => 'danger',
-                    'cancelled' => 'gray',
                     default => 'gray',
                 })
                 ->searchable(),
@@ -101,25 +87,16 @@ public static function table(Table $table): Table
                 ->sortable(),
             Tables\Columns\TextColumn::make('pickup_location')
                 ->limit(30)
-                ->tooltip(fn (Transaction $record): string => $record->pickup_location),
+                ->tooltip(fn ($record) => $record->pickup_location),
             Tables\Columns\TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ])
-        ->filters([
-            Tables\Filters\SelectFilter::make('status')
-                ->options([
-                    'pending' => 'Pending',
-                    'verified' => 'Verified',
-                    'rejected' => 'Rejected',
-                    'completed' => 'Completed',
-                    'cancelled' => 'Cancelled',
-                ]),
-        ])
+        // ... (filters, actions, bulkActions tetap sama atau sesuaikan jika perlu)
         ->actions([
             Tables\Actions\EditAction::make(),
-            Tables\Actions\ViewAction::make(), // Tambahkan view action
+            Tables\Actions\ViewAction::make(),
             Tables\Actions\DeleteAction::make(),
         ])
         ->bulkActions([
@@ -128,7 +105,6 @@ public static function table(Table $table): Table
             ]),
         ]);
 }
-
     public static function getRelations(): array
     {
         return [
