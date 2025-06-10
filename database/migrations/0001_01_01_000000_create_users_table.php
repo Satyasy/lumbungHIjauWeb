@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id(); // bigint UNSIGNED NOT NULL AUTO_INCREMENT
             $table->string('name'); // varchar(255) NOT NULL
             $table->string('email')->unique(); // varchar(255) NOT NULL UNIQUE
-            $table->string('phone_number'); // varchar(255) NOT NULL
+            $table->string('phone_number')->nullable(); // varchar(255) NOT NULL
             $table->string('password'); // varchar(255) NOT NULL
             $table->string('avatar')->nullable(); // varchar(255) DEFAULT NULL
             $table->enum('role', ['user', 'collector', 'admin'])->default('user'); // enum NOT NULL DEFAULT 'user'
