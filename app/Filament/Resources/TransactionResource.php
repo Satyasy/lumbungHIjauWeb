@@ -34,17 +34,6 @@ class TransactionResource extends Resource
         return 'warning';
     }
 
-    public static function getNavigationItems(): array
-    {
-        return [
-            ...parent::getNavigationItems(),
-            NavigationItem::make('Transaction Details')
-                ->icon('heroicon-o-rectangle-stack')
-                ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.transaction-details.*'))
-                ->url(fn (): string => TransactionDetailResource::getUrl('index')),
-        ];
-    }
-
     public static function form(Form $form): Form
     {
         return $form
