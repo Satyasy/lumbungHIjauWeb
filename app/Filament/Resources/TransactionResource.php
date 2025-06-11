@@ -29,7 +29,7 @@ public static function form(Form $form): Form
                 ->preload()
                 ->required(),
             Forms\Components\Textarea::make('pickup_location')
-                ->nullable() // Sesuai SQL
+                    ->nullable()
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('total_weight')
                 ->numeric()
@@ -39,11 +39,11 @@ public static function form(Form $form): Form
                 ->numeric()
                 ->inputMode('decimal')
                 ->nullable(),
-            Forms\Components\FileUpload::make('image_path') // BARU
+                Forms\Components\FileUpload::make('image_path')
                 ->image()
-                ->directory('transaction_proofs') // Tentukan folder penyimpanan
+                    ->directory('transaction_proofs')
                 ->nullable(),
-            Forms\Components\Select::make('status') // ENUM DIPERBARUI
+                Forms\Components\Select::make('status')
                 ->options([
                     'cart' => 'Cart',
                     'pending' => 'Pending',
@@ -54,7 +54,8 @@ public static function form(Form $form): Form
                 ->default('cart'),
             Forms\Components\Textarea::make('rejection_reason')
                 ->nullable()
-                ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->visible(fn ($get) => $get('status') === 'rejected'),
         ]);
 }
 
@@ -66,10 +67,7 @@ public static function table(Table $table): Table
                 ->label('User')
                 ->searchable()
                 ->sortable(),
-            Tables\Columns\ImageColumn::make('image_path') // BARU
-                ->disk('public') // Sesuaikan disk jika perlu
-                ->label('Image Proof'),
-            Tables\Columns\TextColumn::make('status') // ENUM DIPERBARUI
+                Tables\Columns\TextColumn::make('status')
                 ->badge()
                 ->color(fn (string $state): string => match ($state) {
                     'cart' => 'gray',
@@ -88,15 +86,23 @@ public static function table(Table $table): Table
             Tables\Columns\TextColumn::make('pickup_location')
                 ->limit(30)
                 ->tooltip(fn ($record) => $record->pickup_location),
+                Tables\Columns\ImageColumn::make('image_path')
+                    ->disk('public'),
+                Tables\Columns\TextColumn::make('rejection_reason')
+                    ->limit(30)
+                    ->tooltip(fn ($record) => $record->rejection_reason)
+                    ->visible(fn ($record) => $record->status === 'rejected'),
             Tables\Columns\TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ])
-        // ... (filters, actions, bulkActions tetap sama atau sesuaikan jika perlu)
+            ->filters([
+                //
+            ])
         ->actions([
+                Tables\Actions\ViewAction::make(),
             Tables\Actions\EditAction::make(),
-            Tables\Actions\ViewAction::make(),
             Tables\Actions\DeleteAction::make(),
         ])
         ->bulkActions([
@@ -105,6 +111,7 @@ public static function table(Table $table): Table
             ]),
         ]);
 }
+
     public static function getRelations(): array
     {
         return [
