@@ -12,12 +12,36 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Navigation\NavigationItem;
 
 class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'mdi-transition-masked';
+
+    protected static ?string $navigationGroup = 'Transactions';
+    
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'pending')->count() ?: null;
+    }
+    
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationItems(): array
+    {
+        return [
+            ...parent::getNavigationItems(),
+            NavigationItem::make('Transaction Details')
+                ->icon('heroicon-o-rectangle-stack')
+                ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.resources.transaction-details.*'))
+                ->url(fn (): string => TransactionDetailResource::getUrl('index')),
+        ];
+    }
 
 public static function form(Form $form): Form
 {

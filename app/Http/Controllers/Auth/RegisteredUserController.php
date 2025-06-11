@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\Collector;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -29,34 +28,24 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-        'role' => ['required', 'string', 'in:user,collector'], // <-- Validasi role
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-    ]);
-
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'role' => $request->role, // <-- Simpan role
-        'password' => Hash::make($request->password),
-        // 'balance' => 0, // Default balance jika ada di model User $attributes
-    ]);
-
-    // Jika role adalah collector, buat juga entri di tabel collectors
-    if ($request->role === 'collector') {
-        Collector::create([
-            'user_id' => $user->id,
-            // 'assigned_area' => 'Default Area', // Atau biarkan kosong jika nullable
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => 'user',
+            'password' => Hash::make($request->password),
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route(config('fortify.home'), absolute: false));
     }
-
-    event(new Registered($user));
-
-    Auth::login($user);
-
-    return redirect(route(config('fortify.home'), absolute: false)); // Atau ke dashboard user
-}
 }

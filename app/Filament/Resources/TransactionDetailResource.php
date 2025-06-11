@@ -19,7 +19,11 @@ class TransactionDetailResource extends Resource
     
     protected static ?string $navigationGroup = 'Transactions';
     
+    protected static ?string $navigationParent = 'Transactions';
+    
     protected static ?int $navigationSort = 2;
+    
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {
