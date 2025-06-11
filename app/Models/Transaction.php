@@ -17,6 +17,7 @@ class Transaction extends Model
         'pickup_location',
         'total_weight',
         'total_price',
+        'image_path',
         'status',
         'verification_token',
         'token_expires_at',
@@ -39,7 +40,7 @@ class Transaction extends Model
         return $this->belongsTo(Collector::class, 'collector_id');
     }
 
-    public function transactionDetails(): HasMany // Detail item sampah
+    public function details(): HasMany // Detail item sampah
     {
         return $this->hasMany(TransactionDetail::class);
     }

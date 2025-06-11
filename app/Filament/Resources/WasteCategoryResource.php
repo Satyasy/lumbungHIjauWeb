@@ -19,26 +19,26 @@ class WasteCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'hugeicons-waste-restore';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
+public static function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            Forms\Components\TextInput::make('name')
+                ->required()
                     ->maxLength(191)
                     ->label('Nama Kategori'),
                     
-                Forms\Components\Select::make('type')
-                    ->options([
+            Forms\Components\Select::make('type')
+                ->options([
                         'organic' => 'Organik',
                         'inorganic' => 'Anorganik',
-                    ])
+                ])
                     ->required()
                     ->label('Tipe'),
                     
-                Forms\Components\TextInput::make('price_per_kg')
-                    ->required()
-                    ->numeric()
+            Forms\Components\TextInput::make('price_per_kg')
+                ->required()
+                ->numeric()
                     ->inputMode('decimal')
                     ->prefix('Rp')
                     ->label('Harga per Kg'),
@@ -50,28 +50,28 @@ class WasteCategoryResource extends Resource
                     ->label('Gambar')
                     ->columnSpanFull()
                     ->nullable(),
-            ]);
-    }
+        ]);
+}
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
                 Tables\Columns\ImageColumn::make('image_path')
                     ->disk('public')
                     ->square()
                     ->label('Gambar'),
                     
-                Tables\Columns\TextColumn::make('name')
+            Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->label('Nama Kategori'),
                     
-                Tables\Columns\TextColumn::make('type')
+            Tables\Columns\TextColumn::make('type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                ->color(fn (string $state): string => match ($state) {
                         'organic' => 'success',
-                        'inorganic' => 'warning',
-                        default => 'gray',
+                    'inorganic' => 'warning',
+                    default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'organic' => 'Organik',
@@ -80,37 +80,37 @@ class WasteCategoryResource extends Resource
                     })
                     ->label('Tipe'),
                     
-                Tables\Columns\TextColumn::make('price_per_kg')
+            Tables\Columns\TextColumn::make('price_per_kg')
                     ->money('IDR')
                     ->sortable()
                     ->label('Harga per Kg'),
                     
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
+            Tables\Columns\TextColumn::make('created_at')
+                ->dateTime()
+                ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Dibuat pada'),
                     
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
+            Tables\Columns\TextColumn::make('updated_at')
+                ->dateTime()
+                ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Diperbarui pada'),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
+        ])
+        ->filters([
+            //
+        ])
+        ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
+        ])
+        ->bulkActions([
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ]);
+}
 
     public static function getRelations(): array
     {
